@@ -34,60 +34,10 @@ jobs:
       - name: Install Bubblewrap CLI
         run: npm install -g @bubblewrap/cli
 
-      - name: Create TWA manifest
+      - name: Prepare build directory
         run: |
           mkdir -p apk-build
-          cat > apk-build/twa-manifest.json << 'MANIFEST'
-{
-  "packageId": "com.highwayracer.app",
-  "host": "highway-racer-virid.vercel.app",
-  "name": "Highway Racer 3D",
-  "launcherName": "HR3D",
-  "display": "fullscreen",
-  "orientation": "landscape",
-  "themeColor": "#000000",
-  "navigationColor": "#000000",
-  "navigationColorDark": "#000000",
-  "navigationDividerColor": "#000000",
-  "navigationDividerColorDark": "#000000",
-  "backgroundColor": "#000000",
-  "startUrl": "/",
-  "iconUrl": "https://highway-racer-virid.vercel.app/icons/icon-512.png",
-  "maskableIconUrl": "https://highway-racer-virid.vercel.app/icons/icon-512.png",
-  "monochromeIconUrl": "https://highway-racer-virid.vercel.app/icons/icon-192.png",
-  "shortcuts": [],
-  "isChromeOSOnly": false,
-  "isMetaQuest": false,
-  "enableNotifications": false,
-  "appVersion": "1.0.0",
-  "appVersionCode": 1,
-  "signingKey": {
-    "path": "./android.keystore",
-    "alias": "hr3d"
-  },
-  "signingKeyFullName": "Highway Racer",
-  "signingKeyOrganization": "HR3D",
-  "signingKeyOrganizationalUnit": "Dev",
-  "signingKeyCountry": "TR",
-  "signingKeyPassword": "HR3d2024!",
-  "signingKeyStorePassword": "HR3d2024!",
-  "minSdkVersion": 24,
-  "targetSdkVersion": 34,
-  "features": {
-    "locationDelegation": { "enabled": false },
-    "playBilling": { "enabled": false }
-  },
-  "alphaDependencies": { "enabled": false },
-  "enableSiteSettingsShortcut": true,
-  "fallbackType": "customtabs",
-  "webManifestUrl": "https://highway-racer-virid.vercel.app/manifest.json",
-  "generatorApp": "bubblewrap",
-  "generatorAppVersion": "1.20.1",
-  "sdkVersion": "1.0.2",
-  "templateVersion": "v2.0.0-rc.0",
-  "splitApks": false
-}
-MANIFEST
+          cp .github/twa-manifest.json apk-build/twa-manifest.json
 
       - name: Generate keystore
         run: |
@@ -103,36 +53,36 @@ MANIFEST
             -dname "CN=Highway Racer, OU=Dev, O=HR3D, L=Istanbul, ST=Istanbul, C=TR"
 
       - name: Build APK with Bubblewrap
-        env:
-          JAVA_HOME: ${{ env.JAVA_HOME }}
         run: |
           cd apk-build
-          # Answer "n" to JDK install question (we already have Java 17)
           echo "n" | bubblewrap build --skipPwaValidation 2>&1
-          echo "--- Build output ---"
-          find . -name "*.apk" 2>/dev/null || echo "No APK files found"
-          find . -name "*.aab" 2>/dev/null || echo "No AAB files found"
+          echo "=== Build complete, searching for APK ==="
+          find . -name "*.apk" 2>/dev/null || echo "No APK found"
+          find . -name "*.aab" 2>/dev/null || echo "No AAB found"
           ls -la
 
-      - name: Find and rename APK
+      - name: Find and copy APK
         run: |
           APK=$(find apk-build -name "*.apk" 2>/dev/null | head -1)
           if [ -n "$APK" ]; then
             cp "$APK" highway-racer.apk
-            echo "APK found: $APK → highway-racer.apk"
+            echo "APK_FOUND=true" >> $GITHUB_ENV
+            echo "Found APK: $APK"
           else
-            echo "No APK found, checking all files:"
-            find apk-build -type f 2>/dev/null
+            echo "APK_FOUND=false" >> $GITHUB_ENV
+            echo "WARNING: No APK generated"
+            find apk-build -type f 2>/dev/null | head -20
           fi
 
       - name: Upload APK artifact
+        if: env.APK_FOUND == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: highway-racer-apk
           path: highway-racer.apk
-          if-no-files-found: warn
 
       - name: Create GitHub Release
+        if: env.APK_FOUND == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.${{ github.run_number }}
