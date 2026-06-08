@@ -5,23 +5,29 @@ import { CarBrand } from '@/store/gameStore';
 
 interface Props { color?: string; isNight?: boolean; brand?: CarBrand; }
 
-const Wheel = ({ pos, flip = false }: { pos: [number, number, number]; flip?: boolean }) => (
-  <group position={pos} rotation={[0, flip ? Math.PI : 0, 0]}>
-    <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
+// Wheel: group rotation [0,0,π/2] → cylinder local-Y becomes world-X (sideways axle).
+// Spokes rotate around local-Y (= world-X axle) and extend along local-Z (visible face).
+const Wheel = ({ pos }: { pos: [number, number, number] }) => (
+  <group position={pos} rotation={[0, 0, Math.PI / 2]}>
+    {/* Tire */}
+    <mesh castShadow>
       <cylinderGeometry args={[0.38, 0.38, 0.28, 24]} />
       <meshStandardMaterial color="#111" roughness={0.95} />
     </mesh>
-    <mesh rotation={[Math.PI / 2, 0, 0]}>
+    {/* Rim */}
+    <mesh>
       <cylinderGeometry args={[0.25, 0.25, 0.29, 20]} />
       <meshStandardMaterial color="#c0c0c0" metalness={0.92} roughness={0.12} />
     </mesh>
+    {/* 5 spokes — rotate around local-Y, extend along local-Z */}
     {[0, 1, 2, 3, 4].map(i => (
-      <mesh key={i} rotation={[Math.PI / 2, (i * Math.PI * 2) / 5, 0]}>
-        <boxGeometry args={[0.045, 0.46, 0.045]} />
+      <mesh key={i} rotation={[0, (i * Math.PI * 2) / 5, 0]}>
+        <boxGeometry args={[0.045, 0.045, 0.50]} />
         <meshStandardMaterial color="#aaa" metalness={0.9} roughness={0.15} />
       </mesh>
     ))}
-    <mesh rotation={[Math.PI / 2, 0, 0]}>
+    {/* Center hub */}
+    <mesh>
       <cylinderGeometry args={[0.07, 0.07, 0.3, 8]} />
       <meshStandardMaterial color="#333" metalness={0.8} />
     </mesh>
@@ -148,9 +154,9 @@ function BaseBody({ color, isNight, children }: { color: string; isNight: boolea
       {children}
       {/* Wheels */}
       <Wheel pos={[1.13, 0.38, 1.5]} />
-      <Wheel pos={[-1.13, 0.38, 1.5]} flip />
+      <Wheel pos={[-1.13, 0.38, 1.5]} />
       <Wheel pos={[1.13, 0.38, -1.5]} />
-      <Wheel pos={[-1.13, 0.38, -1.5]} flip />
+      <Wheel pos={[-1.13, 0.38, -1.5]} />
     </>
   );
 }
@@ -400,7 +406,7 @@ function AudiFront({ isNight }: { isNight: boolean }) {
 }
 
 /* ─── Tofaş Şahin front/rear ─── */
-function TofasFront({ color, isNight }: { color: string; isNight: boolean }) {
+function TofasFront({ isNight }: { isNight: boolean }) {
   const ei = isNight ? 3 : 1;
   return (
     <>
@@ -485,7 +491,7 @@ export const PlayerCarMesh = forwardRef<Group, Props>(({ color = '#e11d48', isNi
         {brand === 'bmw' && <BMWFront isNight={isNight} />}
         {brand === 'mercedes' && <MercedesFront isNight={isNight} />}
         {brand === 'audi' && <AudiFront isNight={isNight} />}
-        {brand === 'tofas' && <TofasFront color={color} isNight={isNight} />}
+        {brand === 'tofas' && <TofasFront isNight={isNight} />}
       </BaseBody>
     </group>
   );

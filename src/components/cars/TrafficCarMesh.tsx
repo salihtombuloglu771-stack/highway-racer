@@ -9,8 +9,9 @@ interface Props {
   isNight?: boolean;
 }
 
+// rotation [0,0,π/2] → cylinder extends along world-X (sideways axle)
 const SmallWheel = ({ pos }: { pos: [number, number, number] }) => (
-  <group position={pos} rotation={[Math.PI / 2, 0, 0]}>
+  <group position={pos} rotation={[0, 0, Math.PI / 2]}>
     <mesh castShadow>
       <cylinderGeometry args={[0.33, 0.33, 0.26, 18]} />
       <meshStandardMaterial color="#111" roughness={0.95} />
@@ -27,7 +28,7 @@ const SmallWheel = ({ pos }: { pos: [number, number, number] }) => (
 );
 
 const BigWheel = ({ pos }: { pos: [number, number, number] }) => (
-  <group position={pos} rotation={[Math.PI / 2, 0, 0]}>
+  <group position={pos} rotation={[0, 0, Math.PI / 2]}>
     <mesh castShadow>
       <cylinderGeometry args={[0.42, 0.42, 0.36, 18]} />
       <meshStandardMaterial color="#111" roughness={0.95} />

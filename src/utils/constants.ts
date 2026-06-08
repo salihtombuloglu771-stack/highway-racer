@@ -8,27 +8,32 @@ export const SEGMENT_COUNT = 8;
 export const TOTAL_ROAD = SEGMENT_COUNT * SEGMENT_LENGTH;
 
 // Physics
-export const MAX_SPEED = 60;
-export const ACCELERATION = 20;
-export const BRAKING = 35;
-export const FRICTION = 7;
-export const MAX_STEERING = 1.0;
-export const STEERING_SPEED = 3.5;
-export const TURN_RATE = 2.2;
+export const MAX_SPEED      = 68;
+export const ACCELERATION   = 24;
+export const BRAKING        = 40;
+export const FRICTION       = 8;
+export const MAX_STEERING   = 1.0;
+export const STEERING_SPEED = 5.5;
+export const TURN_RATE      = 6.0;  // units/s lateral at full steer + full speed
 
-// Display conversion
-export const SPEED_TO_KMH = 3.2;
+// Nitro boost
+export const NITRO_MAX_SPEED   = 105;  // ~315 km/h display
+export const NITRO_DRAIN       = 0.32; // depletes in ~3.1s
+export const NITRO_RECHARGE    = 0.16; // recharges in ~6.3s
+
+// Display conversion (km/h at MAX_SPEED = 204)
+export const SPEED_TO_KMH = 3.0;
 
 // Traffic
-export const MAX_TRAFFIC = 22;
-export const TRAFFIC_MIN_SPEED = 15;
-export const TRAFFIC_MAX_SPEED = 48;
+export const MAX_TRAFFIC      = 26;
+export const TRAFFIC_MIN_SPEED = 16;
+export const TRAFFIC_MAX_SPEED = 50;
 
 // Scoring
 export const NEAR_MISS_X = 3.2;
 export const NEAR_MISS_Z = 5.0;
-export const COLLISION_X = 1.8;
-export const COLLISION_Z = 3.8;
+export const COLLISION_X = 1.7;
+export const COLLISION_Z = 3.5;
 
 export const TRAFFIC_TYPES = ['sedan', 'suv', 'truck', 'bus', 'sport'] as const;
 export type TrafficType = (typeof TRAFFIC_TYPES)[number];
@@ -39,10 +44,10 @@ export const TRAFFIC_COLORS = [
 ];
 
 export const PLAYER_COLORS: Record<string, string> = {
-  sport: '#e11d48',
-  blue: '#2563eb',
-  black: '#111',
-  white: '#f9fafb',
+  sport:  '#e11d48',
+  blue:   '#2563eb',
+  black:  '#111',
+  white:  '#f9fafb',
   yellow: '#eab308',
   silver: '#94a3b8',
 };
@@ -51,8 +56,8 @@ export const CAR_BRANDS = ['bmw', 'mercedes', 'audi', 'tofas'] as const;
 export type CarBrand = (typeof CAR_BRANDS)[number];
 
 export const BRAND_NAMES: Record<CarBrand, string> = {
-  bmw: 'BMW',
+  bmw:      'BMW',
   mercedes: 'Mercedes',
-  audi: 'Audi',
-  tofas: 'Tofaş',
+  audi:     'Audi',
+  tofas:    'Tofaş',
 };

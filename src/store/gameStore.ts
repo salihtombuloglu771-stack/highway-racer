@@ -21,11 +21,12 @@ interface GameStore {
   selectedBrand: CarBrand;
   crashed: boolean;
   timeLeft: number;
+  nitroLevel: number;
 
   setMode: (m: GameMode) => void;
   setCameraMode: (m: CameraMode) => void;
   setGameType: (m: GameModeType) => void;
-  updateHUD: (speed: number, score: number, dist: number, mult: number, coins: number) => void;
+  updateHUD: (speed: number, score: number, dist: number, mult: number, coins: number, nitro?: number) => void;
   setGameOver: (score: number) => void;
   resetGame: () => void;
   toggleNight: () => void;
@@ -54,6 +55,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   selectedBrand: 'bmw' as CarBrand,
   crashed: false,
   timeLeft: 60,
+  nitroLevel: 1,
 
   setMode: (mode) => set({ mode }),
   setCameraMode: (cameraMode) => set({ cameraMode }),
@@ -61,8 +63,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const timeLeft = gameType === 'time' ? 60 : 0;
     set({ gameType, timeLeft });
   },
-  updateHUD: (displaySpeed, score, distance, multiplier, coins) =>
-    set({ displaySpeed, score, distance, multiplier, coins }),
+  updateHUD: (displaySpeed, score, distance, multiplier, coins, nitro) =>
+    set({ displaySpeed, score, distance, multiplier, coins, ...(nitro !== undefined ? { nitroLevel: nitro } : {}) }),
   setGameOver: (score) => {
     const hs = Math.max(get().highScore, score);
     if (typeof window !== 'undefined') {

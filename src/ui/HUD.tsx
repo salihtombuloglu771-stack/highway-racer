@@ -4,9 +4,9 @@ import { useIsMobile } from '@/hooks/useMobile';
 import { MobileControls } from './MobileControls';
 
 export function HUD() {
-  const { displaySpeed, score, distance, multiplier, cameraMode, setCameraMode, setMode, isNightMode, toggleNight, gameType, timeLeft } = useGameStore();
+  const { displaySpeed, score, distance, multiplier, cameraMode, setCameraMode, setMode, isNightMode, toggleNight, gameType, timeLeft, nitroLevel } = useGameStore();
   const isMobile = useIsMobile();
-  const maxKmh = Math.round(60 * 3.2);
+  const maxKmh = Math.round(68 * 3.0);
   const speedPct = Math.min(displaySpeed / maxKmh, 1);
 
   return (
@@ -63,6 +63,19 @@ export function HUD() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className={`w-1.5 md:w-2 h-1.5 md:h-2 rounded-full transition-colors ${i < Math.ceil(speedPct * 6) ? 'bg-cyan-400' : 'bg-white/20'}`} />
           ))}
+        </div>
+        {/* Nitro bar */}
+        <div className="w-36 md:w-44 mt-1">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span className="text-cyan-400 text-[10px] font-bold uppercase tracking-wider">⚡ NİTRO</span>
+            <span className="text-white/40 text-[9px]">SHIFT</span>
+          </div>
+          <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-100 ${nitroLevel > 0.5 ? 'bg-cyan-400' : nitroLevel > 0.2 ? 'bg-yellow-400' : 'bg-rose-500'}`}
+              style={{ width: `${nitroLevel * 100}%` }}
+            />
+          </div>
         </div>
       </div>
 

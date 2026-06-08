@@ -10,6 +10,7 @@ import { RoadSegmentMesh } from '@/components/road/RoadSegmentMesh';
 import { Environment } from '@/components/environment/Environment';
 import {
   MAX_SPEED, ACCELERATION, BRAKING, FRICTION, MAX_STEERING, STEERING_SPEED, TURN_RATE,
+  NITRO_MAX_SPEED, NITRO_DRAIN, NITRO_RECHARGE,
   SEGMENT_LENGTH, SEGMENT_COUNT, SPEED_TO_KMH, LANE_POSITIONS, LANE_COUNT,
   MAX_TRAFFIC, TRAFFIC_MIN_SPEED, TRAFFIC_MAX_SPEED, TRAFFIC_TYPES, TRAFFIC_COLORS,
   NEAR_MISS_X, NEAR_MISS_Z, COLLISION_X, COLLISION_Z, TrafficType,
@@ -69,6 +70,7 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
   const camShake = useRef(0);
   const lastMode = useRef(mode);
   const nearMissCooldown = useRef(0);
+  const nitroLevel = useRef(1.0);
   const paused = useRef(false);
   const camSwitchPressed = useRef(false);
   const nightPressed = useRef(false);
@@ -180,11 +182,21 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
     }
 
     // ── PHYSICS ──────────────────────────────────────────────────────
-    const { forward, backward, left, right, handbrake } = keys.current;
+    const { forward, backward, left, right, handbrake, nitro } = keys.current;
+
+    // Nitro
+    if (nitro && nitroLevel.current > 0) {
+      nitroLevel.current = Math.max(0, nitroLevel.current - NITRO_DRAIN * dt);
+    } else {
+      nitroLevel.current = Math.min(1, nitroLevel.current + NITRO_RECHARGE * dt);
+    }
+    const nitroActive = nitro && nitroLevel.current > 0;
+    const topSpeed = nitroActive ? NITRO_MAX_SPEED : MAX_SPEED;
 
     // Speed
     if (forward) {
-      playerSpeed.current = Math.min(playerSpeed.current + ACCELERATION * dt, MAX_SPEED);
+      const accel = nitroActive ? ACCELERATION * 2.2 : ACCELERATION;
+      playerSpeed.current = Math.min(playerSpeed.current + accel * dt, topSpeed);
     } else if (backward) {
       playerSpeed.current = Math.max(playerSpeed.current - BRAKING * dt, 0);
     } else {
@@ -197,7 +209,7 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
     const speed = playerSpeed.current;
     const normSpeed = speed / MAX_SPEED;
 
-    // Steering
+    // Steering — allow movement even at low speed so controls always feel responsive
     const steerDir = (right ? 1 : 0) - (left ? 1 : 0);
     if (steerDir !== 0) {
       playerSteering.current = MathUtils.clamp(
@@ -209,8 +221,9 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
       playerSteering.current = lerp(playerSteering.current, 0, Math.min(1, 8 * dt));
     }
 
-    // Apply lateral movement
-    const turnAmount = playerSteering.current * normSpeed * TURN_RATE * dt;
+    // Apply lateral movement — minimum steer factor 0.18 so player can steer even at low speed
+    const steerFactor = Math.max(normSpeed, 0.18);
+    const turnAmount = playerSteering.current * steerFactor * TURN_RATE * dt;
     playerX.current = MathUtils.clamp(playerX.current + turnAmount, -6.5, 6.5);
 
     // Visual yaw
@@ -346,6 +359,7 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
         Math.floor(distance.current / 10),
         Math.round(multiplier.current * 10) / 10,
         coins.current,
+        nitroLevel.current,
       );
     }
   });
