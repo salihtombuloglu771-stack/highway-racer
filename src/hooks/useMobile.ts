@@ -42,7 +42,8 @@ export function useInstallPrompt() {
 
   const install = async () => {
     if (!promptRef.current) return false;
-    const prompt = promptRef.current as { prompt: () => void; userChoice: Promise<{ outcome: string }> };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const prompt = promptRef.current as any as { prompt: () => void; userChoice: Promise<{ outcome: string }> };
     prompt.prompt();
     const choice = await prompt.userChoice;
     if (choice.outcome === 'accepted') {
