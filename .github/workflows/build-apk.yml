@@ -52,11 +52,16 @@ jobs:
             -keypass "HR3d2024!" \
             -dname "CN=Highway Racer, OU=Dev, O=HR3D, L=Istanbul, ST=Istanbul, C=TR"
 
+      - name: Configure Bubblewrap (skip JDK prompts)
+        run: |
+          mkdir -p ~/.bubblewrap
+          echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > ~/.bubblewrap/config.json
+          cat ~/.bubblewrap/config.json
+
       - name: Build APK with Bubblewrap
         run: |
           cd apk-build
-          # Answer "n" to "install JDK?" then provide JAVA_HOME path
-          printf 'n\n%s\n' "$JAVA_HOME" | bubblewrap build --skipPwaValidation 2>&1
+          bubblewrap build --skipPwaValidation 2>&1
           echo "=== Build complete, searching for APK ==="
           find . -name "*.apk" 2>/dev/null || echo "No APK found"
           find . -name "*.aab" 2>/dev/null || echo "No AAB found"
