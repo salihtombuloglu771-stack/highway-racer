@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useInstallPrompt, isIOS, isAndroid } from '@/hooks/useMobile';
 
-const APK_URL = 'https://github.com/YOUR_USER/highway-racer/releases/latest/download/highway-racer.apk';
+const APK_URL = 'https://github.com/salihtombuloglu771-stack/highway-racer/releases/latest/download/app-release-signed.apk';
 
 export function InstallBanner() {
   const { canInstall, isInstalled, install } = useInstallPrompt();

@@ -1,0 +1,143 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli
+
+      - name: Create TWA manifest
+        run: |
+          mkdir -p apk-build
+          cat > apk-build/twa-manifest.json << 'MANIFEST'
+          {
+            "packageId": "com.highwayracer.app",
+            "host": "highway-racer-virid.vercel.app",
+            "name": "Highway Racer 3D",
+            "launcherName": "HR3D",
+            "display": "fullscreen",
+            "orientation": "landscape",
+            "themeColor": "#000000",
+            "navigationColor": "#000000",
+            "navigationColorDark": "#000000",
+            "navigationDividerColor": "#000000",
+            "navigationDividerColorDark": "#000000",
+            "backgroundColor": "#000000",
+            "startUrl": "/",
+            "iconUrl": "https://highway-racer-virid.vercel.app/icons/icon-512.png",
+            "maskableIconUrl": "https://highway-racer-virid.vercel.app/icons/icon-512.png",
+            "monochromeIconUrl": "https://highway-racer-virid.vercel.app/icons/icon-192.png",
+            "shortcuts": [],
+            "isChromeOSOnly": false,
+            "isMetaQuest": false,
+            "enableNotifications": false,
+            "appVersion": "1.0.0",
+            "appVersionCode": 1,
+            "signingKey": {
+              "path": "./android.keystore",
+              "alias": "hr3d"
+            },
+            "signingKeyFullName": "Highway Racer",
+            "signingKeyOrganization": "HR3D",
+            "signingKeyOrganizationalUnit": "Dev",
+            "signingKeyCountry": "TR",
+            "signingKeyPassword": "HR3d2024!",
+            "signingKeyStorePassword": "HR3d2024!",
+            "minSdkVersion": 24,
+            "targetSdkVersion": 34,
+            "features": {
+              "locationDelegation": { "enabled": false },
+              "playBilling": { "enabled": false }
+            },
+            "alphaDependencies": { "enabled": false },
+            "enableSiteSettingsShortcut": true,
+            "fallbackType": "customtabs",
+            "webManifestUrl": "https://highway-racer-virid.vercel.app/manifest.json",
+            "generatorApp": "bubblewrap",
+            "generatorAppVersion": "1.20.1",
+            "sdkVersion": "1.0.2",
+            "templateVersion": "v2.0.0-rc.0",
+            "splitApks": false
+          }
+          MANIFEST
+
+      - name: Generate keystore
+        run: |
+          cd apk-build
+          keytool -genkey -v \
+            -keystore android.keystore \
+            -alias hr3d \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass "HR3d2024!" \
+            -keypass "HR3d2024!" \
+            -dname "CN=Highway Racer, OU=Dev, O=HR3D, L=Istanbul, ST=Istanbul, C=TR"
+
+      - name: Build APK with Bubblewrap
+        run: |
+          cd apk-build
+          bubblewrap build --skipPwaValidation 2>&1 || true
+          # Check output
+          find . -name "*.apk" 2>/dev/null
+          find . -name "*.aab" 2>/dev/null
+          ls -la
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: highway-racer-apk
+          path: |
+            apk-build/app-release-signed.apk
+            apk-build/app/build/outputs/apk/**/*.apk
+            apk-build/*.apk
+          if-no-files-found: warn
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Highway Racer 3D v1.0.${{ github.run_number }}
+          body: |
+            ## Android APK İndir
+
+            **Highway Racer 3D** - 3D araba yarışı oyunu
+
+            ### Kurulum Adımları
+            1. `highway-racer.apk` dosyasını indirin
+            2. Telefon Ayarları → Güvenlik → **Bilinmeyen kaynaklardan yükleme**'yi açın
+            3. APK dosyasına dokunarak kurulumu başlatın
+
+            > Minimum Android 7.0 (API 24) gerektirir
+          files: |
+            apk-build/app-release-signed.apk
+            apk-build/app/build/outputs/apk/release/*.apk
+          fail_on_unmatched_files: false
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

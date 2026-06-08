@@ -15,7 +15,7 @@ const COLOR_NAMES: Record<string, string> = {
   sport: 'Kırmızı', blue: 'Mavi', black: 'Siyah', white: 'Beyaz', yellow: 'Sarı', silver: 'Gümüş',
 };
 
-const APK_URL = 'https://github.com/YOUR_USER/highway-racer/releases/latest/download/highway-racer.apk';
+const APK_URL = 'https://github.com/salihtombuloglu771-stack/highway-racer/releases/latest/download/app-release-signed.apk';
 
 export function MainMenu() {
   const { setMode, setGameType, gameType, highScore, selectedColor, setSelectedColor } = useGameStore();
