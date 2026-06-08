@@ -61,7 +61,8 @@ jobs:
       - name: Build APK with Bubblewrap
         run: |
           cd apk-build
-          bubblewrap build --skipPwaValidation 2>&1
+          # Use yes to auto-answer all remaining prompts (update checks etc.)
+          yes | bubblewrap build --skipPwaValidation 2>&1 || true
           echo "=== Build complete, searching for APK ==="
           find . -name "*.apk" 2>/dev/null || echo "No APK found"
           find . -name "*.aab" 2>/dev/null || echo "No AAB found"
