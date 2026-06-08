@@ -1,0 +1,31 @@
+{
+  "name": "Highway Racer 3D",
+  "short_name": "HR3D",
+  "description": "Modern 3D araba yarışı oyunu - Traffic Racer tarzı",
+  "start_url": "/",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "categories": ["games", "entertainment"],
+  "lang": "tr",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Oyna",
+      "short_name": "Oyna",
+      "description": "Hemen oyna",
+      "url": "/"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
