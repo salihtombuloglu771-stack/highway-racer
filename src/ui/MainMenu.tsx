@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useGameStore, GameModeType } from '@/store/gameStore';
-import { PLAYER_COLORS } from '@/utils/constants';
+import { PLAYER_COLORS, CAR_BRANDS, BRAND_NAMES, CarBrand } from '@/utils/constants';
 import { useInstallPrompt, isIOS, isAndroid } from '@/hooks/useMobile';
 
 const MODES: { id: GameModeType; label: string; desc: string; icon: string }[] = [
@@ -18,7 +18,7 @@ const COLOR_NAMES: Record<string, string> = {
 const APK_URL = 'https://github.com/salihtombuloglu771-stack/highway-racer/releases/latest/download/app-release-signed.apk';
 
 export function MainMenu() {
-  const { setMode, setGameType, gameType, highScore, selectedColor, setSelectedColor } = useGameStore();
+  const { setMode, setGameType, gameType, highScore, selectedColor, setSelectedColor, selectedBrand, setSelectedBrand } = useGameStore();
   const { canInstall, isInstalled, install } = useInstallPrompt();
   const [platform, setPlatform] = useState<'ios' | 'android' | 'desktop'>('desktop');
   const [showIOSGuide, setShowIOSGuide] = useState(false);
@@ -79,6 +79,22 @@ export function MainMenu() {
             <p className="text-white/40 text-[9px] md:text-[10px] mt-0.5 leading-tight hidden md:block">{m.desc}</p>
           </button>
         ))}
+      </div>
+
+      {/* Car brand */}
+      <div className="mb-3 px-4 w-full max-w-xs md:max-w-md">
+        <p className="text-white/50 text-[10px] text-center uppercase tracking-wider mb-2">Araç Markası</p>
+        <div className="grid grid-cols-4 gap-2">
+          {CAR_BRANDS.map(brand => (
+            <button key={brand} onClick={() => setSelectedBrand(brand as CarBrand)}
+              className={`rounded-xl py-2 px-1 border transition-all text-center ${selectedBrand === brand ? 'bg-rose-600/80 border-rose-400/50 shadow-lg shadow-rose-500/20' : 'bg-white/5 border-white/10 active:bg-white/10'}`}>
+              <div className="text-lg leading-none mb-0.5">
+                {brand === 'bmw' ? '🔵' : brand === 'mercedes' ? '⭐' : brand === 'audi' ? '⚪' : '🇹🇷'}
+              </div>
+              <p className="text-white text-[10px] font-bold leading-tight">{BRAND_NAMES[brand as CarBrand]}</p>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Car color */}

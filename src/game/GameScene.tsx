@@ -53,7 +53,7 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
   useThree(); // access camera via useFrame below
   const keys = useInput();
 
-  const { mode, cameraMode, isNightMode, selectedColor, updateHUD, setGameOver, resetGame, toggleNight, setMode, tickTime } = useGameStore();
+  const { mode, cameraMode, isNightMode, selectedColor, selectedBrand, updateHUD, setGameOver, resetGame, toggleNight, setMode, tickTime } = useGameStore();
 
   // Physics refs (avoid React re-renders)
   const playerX = useRef(0);
@@ -373,7 +373,7 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
       ))}
 
       {/* Player car */}
-      <PlayerCarMesh ref={playerCarRef} color={carColor} isNight={isNightMode} />
+      <PlayerCarMesh ref={playerCarRef} color={carColor} isNight={isNightMode} brand={selectedBrand} />
 
       {/* Player headlight beams */}
       {isNightMode && (

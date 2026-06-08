@@ -46,3 +46,13 @@ export const PLAYER_COLORS: Record<string, string> = {
   yellow: '#eab308',
   silver: '#94a3b8',
 };
+
+export const CAR_BRANDS = ['bmw', 'mercedes', 'audi', 'tofas'] as const;
+export type CarBrand = (typeof CAR_BRANDS)[number];
+
+export const BRAND_NAMES: Record<CarBrand, string> = {
+  bmw: 'BMW',
+  mercedes: 'Mercedes',
+  audi: 'Audi',
+  tofas: 'Tofaş',
+};

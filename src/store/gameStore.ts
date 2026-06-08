@@ -4,6 +4,7 @@ import { create } from 'zustand';
 export type GameMode = 'menu' | 'playing' | 'paused' | 'gameover' | 'garage';
 export type CameraMode = 'follow' | 'cockpit' | 'hood';
 export type GameModeType = 'endless' | 'time' | 'traffic';
+export type CarBrand = 'bmw' | 'mercedes' | 'audi' | 'tofas';
 
 interface GameStore {
   mode: GameMode;
@@ -17,6 +18,7 @@ interface GameStore {
   coins: number;
   isNightMode: boolean;
   selectedColor: string;
+  selectedBrand: CarBrand;
   crashed: boolean;
   timeLeft: number;
 
@@ -28,6 +30,7 @@ interface GameStore {
   resetGame: () => void;
   toggleNight: () => void;
   setSelectedColor: (c: string) => void;
+  setSelectedBrand: (b: CarBrand) => void;
   tickTime: (dt: number) => void;
 }
 
@@ -48,6 +51,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   coins: parseInt(safeGet('hr_coins', '0')),
   isNightMode: false,
   selectedColor: 'sport',
+  selectedBrand: 'bmw' as CarBrand,
   crashed: false,
   timeLeft: 60,
 
@@ -77,6 +81,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   })),
   toggleNight: () => set(s => ({ isNightMode: !s.isNightMode })),
   setSelectedColor: (c) => set({ selectedColor: c }),
+  setSelectedBrand: (b) => set({ selectedBrand: b }),
   tickTime: (dt) => {
     if (get().gameType !== 'time') return;
     const t = get().timeLeft - dt;
