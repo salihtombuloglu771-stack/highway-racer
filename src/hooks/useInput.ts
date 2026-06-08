@@ -22,10 +22,10 @@ export function useInput() {
     const onDown = (e: KeyboardEvent) => {
       if (e.repeat) return;
       switch (e.code) {
-        case 'KeyW': case 'ArrowUp': keys.current.forward = true; break;
-        case 'KeyS': case 'ArrowDown': keys.current.backward = true; break;
-        case 'KeyA': case 'ArrowLeft': keys.current.left = true; break;
-        case 'KeyD': case 'ArrowRight': keys.current.right = true; break;
+        case 'KeyW': case 'ArrowUp': keys.current.forward = true; e.preventDefault(); break;
+        case 'KeyS': case 'ArrowDown': keys.current.backward = true; e.preventDefault(); break;
+        case 'KeyA': case 'ArrowLeft': keys.current.left = true; e.preventDefault(); break;
+        case 'KeyD': case 'ArrowRight': keys.current.right = true; e.preventDefault(); break;
         case 'Space': keys.current.handbrake = true; e.preventDefault(); break;
         case 'KeyC': keys.current.camSwitch = true; break;
         case 'Escape': case 'KeyP': keys.current.pause = true; break;

@@ -3,6 +3,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { EffectComposer, Bloom, Vignette, ChromaticAberration } from '@react-three/postprocessing';
 import { BlendFunction } from 'postprocessing';
+import { ACESFilmicToneMapping } from 'three';
 import { Vector2 } from 'three';
 import { GameScene } from './GameScene';
 import { useGameStore } from '@/store/gameStore';
@@ -23,7 +24,6 @@ export default function GameCanvas() {
     setMobile(isMobileDevice());
   }, []);
 
-  // Mobile: lower quality, no heavy effects
   const dpr: [number, number] = mobile ? [1, 1.5] : [1, 2];
   const shadows = !mobile;
 
@@ -34,6 +34,8 @@ export default function GameCanvas() {
         antialias: !mobile,
         powerPreference: 'high-performance',
         alpha: false,
+        toneMapping: ACESFilmicToneMapping,
+        toneMappingExposure: isNight ? 1.0 : 1.3,
       }}
       camera={{ fov: 65, near: 0.1, far: mobile ? 400 : 600, position: [0, 3.5, 7] }}
       style={{ width: '100%', height: '100%' }}
@@ -44,20 +46,20 @@ export default function GameCanvas() {
         {!mobile && (
           <EffectComposer>
             <Bloom
-              intensity={isNight ? 1.8 : 0.6}
-              luminanceThreshold={isNight ? 0.4 : 0.7}
-              luminanceSmoothing={0.4}
+              intensity={isNight ? 2.0 : 0.7}
+              luminanceThreshold={isNight ? 0.35 : 0.65}
+              luminanceSmoothing={0.3}
               mipmapBlur
             />
             <ChromaticAberration
               blendFunction={BlendFunction.NORMAL}
-              offset={new Vector2(speedRatio * 0.003, speedRatio * 0.003)}
+              offset={new Vector2(speedRatio * 0.0025, speedRatio * 0.0025)}
               radialModulation={false}
               modulationOffset={0}
             />
             <Vignette
-              offset={0.35}
-              darkness={isNight ? 0.9 : 0.5}
+              offset={0.3}
+              darkness={isNight ? 0.85 : 0.45}
               blendFunction={BlendFunction.NORMAL}
             />
           </EffectComposer>
@@ -65,8 +67,8 @@ export default function GameCanvas() {
         {mobile && (
           <EffectComposer>
             <Bloom
-              intensity={isNight ? 1.2 : 0.4}
-              luminanceThreshold={0.6}
+              intensity={isNight ? 1.4 : 0.45}
+              luminanceThreshold={0.55}
               luminanceSmoothing={0.5}
             />
             <Vignette offset={0.4} darkness={0.5} blendFunction={BlendFunction.NORMAL} />

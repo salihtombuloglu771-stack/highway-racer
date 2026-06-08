@@ -49,7 +49,7 @@ function randomColor() { return TRAFFIC_COLORS[Math.floor(Math.random() * TRAFFI
 
 function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
 
-export function GameScene({ isMobile = false }: GameSceneProps) {
+export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
   useThree(); // access camera via useFrame below
   const keys = useInput();
 
@@ -198,7 +198,7 @@ export function GameScene({ isMobile = false }: GameSceneProps) {
     const normSpeed = speed / MAX_SPEED;
 
     // Steering
-    const steerDir = (left ? 1 : 0) - (right ? 1 : 0);
+    const steerDir = (right ? 1 : 0) - (left ? 1 : 0);
     if (steerDir !== 0) {
       playerSteering.current = MathUtils.clamp(
         playerSteering.current + steerDir * STEERING_SPEED * dt,

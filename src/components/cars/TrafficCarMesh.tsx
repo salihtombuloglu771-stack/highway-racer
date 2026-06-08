@@ -10,27 +10,35 @@ interface Props {
 }
 
 const SmallWheel = ({ pos }: { pos: [number, number, number] }) => (
-  <group position={pos} rotation={[0, 0, Math.PI / 2]}>
-    <mesh>
-      <cylinderGeometry args={[0.33, 0.33, 0.25, 14]} />
-      <meshStandardMaterial color="#111" roughness={0.9} />
+  <group position={pos} rotation={[Math.PI / 2, 0, 0]}>
+    <mesh castShadow>
+      <cylinderGeometry args={[0.33, 0.33, 0.26, 18]} />
+      <meshStandardMaterial color="#111" roughness={0.95} />
     </mesh>
     <mesh>
-      <cylinderGeometry args={[0.18, 0.18, 0.27, 8]} />
-      <meshStandardMaterial color="#888" metalness={0.8} />
+      <cylinderGeometry args={[0.21, 0.21, 0.275, 14]} />
+      <meshStandardMaterial color="#b8b8b8" metalness={0.88} roughness={0.15} />
+    </mesh>
+    <mesh>
+      <cylinderGeometry args={[0.08, 0.08, 0.28, 8]} />
+      <meshStandardMaterial color="#444" metalness={0.7} roughness={0.3} />
     </mesh>
   </group>
 );
 
 const BigWheel = ({ pos }: { pos: [number, number, number] }) => (
-  <group position={pos} rotation={[0, 0, Math.PI / 2]}>
-    <mesh>
-      <cylinderGeometry args={[0.42, 0.42, 0.35, 14]} />
-      <meshStandardMaterial color="#111" roughness={0.9} />
+  <group position={pos} rotation={[Math.PI / 2, 0, 0]}>
+    <mesh castShadow>
+      <cylinderGeometry args={[0.42, 0.42, 0.36, 18]} />
+      <meshStandardMaterial color="#111" roughness={0.95} />
     </mesh>
     <mesh>
-      <cylinderGeometry args={[0.22, 0.22, 0.37, 8]} />
-      <meshStandardMaterial color="#888" metalness={0.8} />
+      <cylinderGeometry args={[0.26, 0.26, 0.375, 14]} />
+      <meshStandardMaterial color="#b0b0b0" metalness={0.85} roughness={0.18} />
+    </mesh>
+    <mesh>
+      <cylinderGeometry args={[0.1, 0.1, 0.38, 8]} />
+      <meshStandardMaterial color="#444" metalness={0.7} roughness={0.3} />
     </mesh>
   </group>
 );
