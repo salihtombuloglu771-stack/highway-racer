@@ -6,6 +6,7 @@ import { MainMenu } from '@/ui/MainMenu';
 import { GameOver } from '@/ui/GameOver';
 import { PauseMenu } from '@/ui/PauseMenu';
 import { InstallBanner } from '@/ui/InstallBanner';
+import { GarageMenu } from '@/ui/GarageMenu';
 
 export default function GameApp() {
   const mode = useGameStore(s => s.mode);
@@ -31,6 +32,7 @@ export default function GameApp() {
         </>
       )}
       {mode === 'gameover' && <GameOver />}
+      {mode === 'garage'   && <GarageMenu />}
 
       {/* Speed lines */}
       <SpeedLines />
@@ -40,7 +42,7 @@ export default function GameApp() {
 
 function SpeedLines() {
   const speed = useGameStore(s => s.displaySpeed);
-  const maxKmh = 60 * 3.2;
+  const maxKmh = 72 * 3.0;
   const ratio = speed / maxKmh;
   if (ratio < 0.65) return null;
   const intensity = (ratio - 0.65) / 0.35;

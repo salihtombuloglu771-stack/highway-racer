@@ -1,42 +1,61 @@
-export const LANE_COUNT = 4;
-export const LANE_WIDTH = 3.5;
-export const ROAD_WIDTH = LANE_COUNT * LANE_WIDTH; // 14
-export const LANE_POSITIONS = [-5.25, -1.75, 1.75, 5.25];
+// Road geometry — 3 lanes per direction
+export const LANE_COUNT          = 3;
+export const LANE_WIDTH          = 2.8;
+export const ONCOMING_LANE_COUNT = 3;
+
+// Right-side (player direction) lane centres
+export const LANE_POSITIONS  = [1.4, 4.2, 7.0] as const;
+// Left-side (oncoming) lane centres
+export const ONCOMING_LANES  = [-7.0, -4.2, -1.4] as const;
+
+export const ROAD_HALF_WIDTH = LANE_COUNT * LANE_WIDTH;        // 8.4
+export const ROAD_WIDTH      = ROAD_HALF_WIDTH * 2;            // 16.8
 
 export const SEGMENT_LENGTH = 200;
-export const SEGMENT_COUNT = 8;
-export const TOTAL_ROAD = SEGMENT_COUNT * SEGMENT_LENGTH;
+export const SEGMENT_COUNT  = 8;
+export const TOTAL_ROAD     = SEGMENT_COUNT * SEGMENT_LENGTH;
 
-// Physics
-export const MAX_SPEED      = 68;
-export const ACCELERATION   = 24;
-export const BRAKING        = 40;
-export const FRICTION       = 8;
+// Player movement bounds & start
+export const PLAYER_MIN_X   = -8.0;
+export const PLAYER_MAX_X   = 8.0;
+export const PLAYER_START_X = 4.2;   // centre of right-side lanes
+
+// ── Physics ───────────────────────────────────────────────────────────────
+export const MAX_SPEED      = 72;
+export const ACCELERATION   = 26;
+export const BRAKING        = 44;
+export const FRICTION       = 9;
 export const MAX_STEERING   = 1.0;
 export const STEERING_SPEED = 5.5;
-export const TURN_RATE      = 6.0;  // units/s lateral at full steer + full speed
+export const TURN_RATE      = 6.5;
 
 // Nitro boost
-export const NITRO_MAX_SPEED   = 105;  // ~315 km/h display
-export const NITRO_DRAIN       = 0.32; // depletes in ~3.1s
-export const NITRO_RECHARGE    = 0.16; // recharges in ~6.3s
+export const NITRO_MAX_SPEED = 112;
+export const NITRO_DRAIN     = 0.30;
+export const NITRO_RECHARGE  = 0.15;
 
-// Display conversion (km/h at MAX_SPEED = 204)
+// Display conversion  (km/h at MAX_SPEED = 216)
 export const SPEED_TO_KMH = 3.0;
 
-// Traffic
-export const MAX_TRAFFIC      = 26;
-export const TRAFFIC_MIN_SPEED = 16;
-export const TRAFFIC_MAX_SPEED = 50;
+// ── Traffic ───────────────────────────────────────────────────────────────
+export const MAX_TRAFFIC        = 18;
+export const MAX_ONCOMING       = 10;
+export const TRAFFIC_MIN_SPEED  = 18;
+export const TRAFFIC_MAX_SPEED  = 52;
+export const ONCOMING_MIN_SPEED = 22;
+export const ONCOMING_MAX_SPEED = 58;
 
-// Scoring
-export const NEAR_MISS_X = 3.2;
-export const NEAR_MISS_Z = 5.0;
-export const COLLISION_X = 1.7;
-export const COLLISION_Z = 3.5;
+// ── Scoring ───────────────────────────────────────────────────────────────
+export const NEAR_MISS_X              = 3.0;
+export const NEAR_MISS_Z              = 5.0;
+export const COLLISION_X              = 1.6;
+export const COLLISION_Z              = 3.5;
+export const NEAR_MISS_BONUS          = 100;
+export const ONCOMING_NEAR_MISS_BONUS = 250;
+export const OVERTAKE_BONUS           = 50;
 
 export const TRAFFIC_TYPES = ['sedan', 'suv', 'truck', 'bus', 'sport'] as const;
-export type TrafficType = (typeof TRAFFIC_TYPES)[number];
+export type  TrafficType   = (typeof TRAFFIC_TYPES)[number];
 
 export const TRAFFIC_COLORS = [
   '#2563eb', '#16a34a', '#ca8a04', '#9333ea',
@@ -52,8 +71,8 @@ export const PLAYER_COLORS: Record<string, string> = {
   silver: '#94a3b8',
 };
 
-export const CAR_BRANDS = ['bmw', 'mercedes', 'audi', 'tofas'] as const;
-export type CarBrand = (typeof CAR_BRANDS)[number];
+export const CAR_BRANDS  = ['bmw', 'mercedes', 'audi', 'tofas'] as const;
+export type  CarBrand    = (typeof CAR_BRANDS)[number];
 
 export const BRAND_NAMES: Record<CarBrand, string> = {
   bmw:      'BMW',

@@ -16,7 +16,7 @@ function isMobileDevice() {
 export default function GameCanvas() {
   const isNight = useGameStore(s => s.isNightMode);
   const displaySpeed = useGameStore(s => s.displaySpeed);
-  const maxKmh = 60 * 3.2;
+  const maxKmh = 72 * 3.0;
   const speedRatio = displaySpeed / maxKmh;
   const [mobile, setMobile] = useState(false);
 
@@ -46,20 +46,20 @@ export default function GameCanvas() {
         {!mobile && (
           <EffectComposer>
             <Bloom
-              intensity={isNight ? 2.0 : 0.7}
-              luminanceThreshold={isNight ? 0.35 : 0.65}
-              luminanceSmoothing={0.3}
+              intensity={isNight ? 2.8 : 1.1}
+              luminanceThreshold={isNight ? 0.28 : 0.55}
+              luminanceSmoothing={0.25}
               mipmapBlur
             />
             <ChromaticAberration
               blendFunction={BlendFunction.NORMAL}
-              offset={new Vector2(speedRatio * 0.0025, speedRatio * 0.0025)}
+              offset={new Vector2(speedRatio * 0.003, speedRatio * 0.003)}
               radialModulation={false}
               modulationOffset={0}
             />
             <Vignette
-              offset={0.3}
-              darkness={isNight ? 0.85 : 0.45}
+              offset={0.28}
+              darkness={isNight ? 0.9 : 0.5}
               blendFunction={BlendFunction.NORMAL}
             />
           </EffectComposer>
@@ -67,11 +67,11 @@ export default function GameCanvas() {
         {mobile && (
           <EffectComposer>
             <Bloom
-              intensity={isNight ? 1.4 : 0.45}
-              luminanceThreshold={0.55}
-              luminanceSmoothing={0.5}
+              intensity={isNight ? 1.8 : 0.65}
+              luminanceThreshold={0.45}
+              luminanceSmoothing={0.4}
             />
-            <Vignette offset={0.4} darkness={0.5} blendFunction={BlendFunction.NORMAL} />
+            <Vignette offset={0.35} darkness={0.55} blendFunction={BlendFunction.NORMAL} />
           </EffectComposer>
         )}
       </Suspense>

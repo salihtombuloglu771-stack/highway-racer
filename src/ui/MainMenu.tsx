@@ -109,11 +109,17 @@ export function MainMenu() {
         </div>
       </div>
 
-      {/* Start */}
-      <button onClick={() => setMode('playing')}
-        className="bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-black text-xl px-10 py-4 rounded-2xl transition-all active:scale-95 shadow-xl shadow-rose-500/30 mb-4">
-        OYNA 🚗
-      </button>
+      {/* Buttons */}
+      <div className="flex gap-3 mb-4">
+        <button onClick={() => setMode('playing')}
+          className="bg-rose-600 hover:bg-rose-500 active:bg-rose-700 text-white font-black text-xl px-10 py-4 rounded-2xl transition-all active:scale-95 shadow-xl shadow-rose-500/30">
+          OYNA 🚗
+        </button>
+        <button onClick={() => setMode('garage')}
+          className="bg-white/10 border border-white/20 hover:bg-white/15 text-white font-black text-xl px-5 py-4 rounded-2xl transition-all active:scale-95">
+          🔧
+        </button>
+      </div>
 
       {/* Install section */}
       {!isInstalled && (

@@ -87,7 +87,7 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
   const keys = useInput();
 
   const {
-    mode, isNightMode, selectedColor, selectedBrand,
+    mode, isNightMode, selectedColor, selectedBrand, selectedCarModel,
     updateHUD, setGameOver, resetGame, toggleNight, setMode, tickTime,
   } = useGameStore();
   const upgrades = useGameStore(s => s.upgrades);
@@ -566,6 +566,7 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
         color={carColor}
         isNight={isNightMode}
         brand={selectedBrand}
+        model={selectedCarModel}
       />
 
       {/* Player headlight beams (night) */}

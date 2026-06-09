@@ -5,191 +5,141 @@ import { Sky, Stars } from '@react-three/drei';
 
 interface Props { isNight: boolean }
 
-const BUILDINGS = [
-  { x: 22,  z: -80,  w: 9,  h: 28, d: 11, c: '#2a3344' },
-  { x: 32,  z: -40,  w: 7,  h: 42, d: 9,  c: '#1e2a38' },
-  { x: 24,  z: 20,   w: 11, h: 18, d: 13, c: '#2e3d4e' },
-  { x: 38,  z: -110, w: 8,  h: 35, d: 10, c: '#1a2433' },
-  { x: -22, z: -70,  w: 9,  h: 32, d: 11, c: '#28223a' },
-  { x: -34, z: -25,  w: 7,  h: 22, d: 9,  c: '#1e1a2e' },
-  { x: -26, z: 35,   w: 11, h: 48, d: 13, c: '#24203a' },
-  { x: -40, z: -100, w: 8,  h: 26, d: 10, c: '#1a2028' },
-  { x: 45,  z: 50,   w: 10, h: 20, d: 12, c: '#223344' },
-  { x: -45, z: 60,   w: 10, h: 16, d: 12, c: '#22283a' },
-  { x: 28,  z: -160, w: 14, h: 55, d: 14, c: '#1e2d3a' },
-  { x: -30, z: -150, w: 14, h: 38, d: 14, c: '#1e2038' },
-];
-
+// Distant mountains — kept but pushed further back
 const MOUNTAINS = [
-  { x: 80,  z: -200, w: 120, h: 55, d: 60, c: '#2a3545' },
-  { x: -90, z: -220, w: 140, h: 70, d: 70, c: '#243040' },
-  { x: 120, z: -350, w: 180, h: 90, d: 80, c: '#1e2a35' },
-  { x: -130,z: -380, w: 200, h: 80, d: 90, c: '#1a2530' },
-  { x: 60,  z: -500, w: 250, h: 100,d: 100,c: '#182028' },
-  { x: -70, z: -480, w: 230, h: 110,d: 110,c: '#1a2030' },
+  { x:  90, z: -280, w: 130, h: 60,  d: 65,  c: '#2a3545' },
+  { x: -100,z: -310, w: 150, h: 78,  d: 75,  c: '#243040' },
+  { x:  140, z: -440, w: 200, h: 95,  d: 85,  c: '#1e2a35' },
+  { x: -150,z: -470, w: 220, h: 88,  d: 95,  c: '#1a2530' },
+  { x:  70,  z: -580, w: 260, h: 108, d: 110, c: '#182028' },
+  { x: -80,  z: -560, w: 240, h: 116, d: 115, c: '#1a2030' },
 ];
 
-const TREE_ROWS = [-1, 1] as const;
-const TREE_Z = [-20, 0, 20, 45, 70, 100, 130, 160, 190, 220];
+// Trees — sparser, further from the wider road (edge at 8.4 + shoulder ~2.2 = 10.6)
+const TREE_SIDES = [-1, 1] as const;
+const TREE_Z     = [-40, 15, 65, 120, 185, 255, 340];
 
 export function Environment({ isNight }: Props) {
   const groundRef = useRef<Mesh>(null);
 
   return (
     <>
-      {/* Sky / Atmosphere */}
+      {/* ── SKY / ATMOSPHERE ─────────────────────────────────── */}
       {isNight ? (
         <>
-          <color attach="background" args={['#03040e']} />
-          <fog attach="fog" args={['#08091a', 80, 280]} />
-          <Stars radius={300} depth={60} count={5000} factor={5} saturation={0.1} fade speed={0.3} />
-          <ambientLight intensity={0.08} color="#1828aa" />
+          <color attach="background" args={['#030410']} />
+          <fog attach="fog" args={['#08091a', 90, 320]} />
+          <Stars radius={300} depth={60} count={6000} factor={5} saturation={0.1} fade speed={0.3} />
+          <ambientLight intensity={0.07} color="#1828aa" />
           <directionalLight
             position={[-20, 35, 15]}
-            intensity={0.18}
+            intensity={0.16}
             color="#3355bb"
             castShadow
             shadow-mapSize={[2048, 2048]}
-            shadow-camera-far={220}
-            shadow-camera-left={-60}
-            shadow-camera-right={60}
-            shadow-camera-top={60}
-            shadow-camera-bottom={-60}
+            shadow-camera-far={240}
+            shadow-camera-left={-70}
+            shadow-camera-right={70}
+            shadow-camera-top={70}
+            shadow-camera-bottom={-70}
           />
-          {/* Moon glow */}
           <pointLight position={[-80, 120, -200]} intensity={0.5} color="#8899ff" distance={600} />
         </>
       ) : (
         <>
-          <color attach="background" args={['#b8cfe8']} />
-          <fog attach="fog" args={['#c8daf0', 120, 420]} />
+          <color attach="background" args={['#bdd4ee']} />
+          <fog attach="fog" args={['#cce0f5', 140, 480]} />
           <Sky
-            sunPosition={[80, 40, -120]}
-            turbidity={6}
-            rayleigh={0.6}
-            mieCoefficient={0.005}
-            mieDirectionalG={0.8}
+            sunPosition={[80, 42, -120]}
+            turbidity={5}
+            rayleigh={0.55}
+            mieCoefficient={0.004}
+            mieDirectionalG={0.82}
             azimuth={195}
           />
-          <ambientLight intensity={0.55} color="#ffe4c8" />
+          <ambientLight intensity={0.58} color="#ffe8cc" />
           <directionalLight
             position={[25, 55, -45]}
-            intensity={2.2}
-            color="#fff5e8"
+            intensity={2.4}
+            color="#fff6e8"
             castShadow
             shadow-mapSize={[2048, 2048]}
-            shadow-camera-far={220}
-            shadow-camera-left={-60}
-            shadow-camera-right={60}
-            shadow-camera-top={60}
-            shadow-camera-bottom={-60}
+            shadow-camera-far={240}
+            shadow-camera-left={-70}
+            shadow-camera-right={70}
+            shadow-camera-top={70}
+            shadow-camera-bottom={-70}
           />
-          <hemisphereLight args={['#88aaff', '#7a6040', 0.45]} />
+          <hemisphereLight args={['#88aaff', '#7a6040', 0.42]} />
         </>
       )}
 
-      {/* === GROUND === */}
-      {/* Main terrain */}
-      <mesh ref={groundRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.07, -100]} receiveShadow>
-        <planeGeometry args={[400, 1200]} />
+      {/* ── GROUND ────────────────────────────────────────────── */}
+      {/* Main terrain — open countryside */}
+      <mesh ref={groundRef} rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.07, -150]} receiveShadow>
+        <planeGeometry args={[600, 1400]} />
         <meshStandardMaterial
-          color={isNight ? '#0c140c' : '#3a5e28'}
-          roughness={0.98}
+          color={isNight ? '#0b130b' : '#4a6e2e'}
+          roughness={0.97}
           metalness={0}
         />
       </mesh>
-      {/* Road shoulder grass */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[18, -0.06, -100]}>
-        <planeGeometry args={[12, 1200]} />
-        <meshStandardMaterial color={isNight ? '#0e180e' : '#4a7032'} roughness={0.98} />
-      </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-18, -0.06, -100]}>
-        <planeGeometry args={[12, 1200]} />
-        <meshStandardMaterial color={isNight ? '#0e180e' : '#4a7032'} roughness={0.98} />
-      </mesh>
 
-      {/* === MOUNTAINS (distant) === */}
+      {/* Near shoulder grass strips (just outside road) */}
+      {([1, -1] as const).map(s => (
+        <mesh key={s} rotation={[-Math.PI / 2, 0, 0]} position={[s * 12.5, -0.06, -150]}>
+          <planeGeometry args={[8, 1400]} />
+          <meshStandardMaterial color={isNight ? '#0d160d' : '#56802e'} roughness={0.97} />
+        </mesh>
+      ))}
+
+      {/* Far field strips (darker tone variation) */}
+      {([1, -1] as const).map(s => (
+        <mesh key={s} rotation={[-Math.PI / 2, 0, 0]} position={[s * 60, -0.06, -150]}>
+          <planeGeometry args={[60, 1400]} />
+          <meshStandardMaterial color={isNight ? '#0a120a' : '#3d5c22'} roughness={0.97} />
+        </mesh>
+      ))}
+
+      {/* ── MOUNTAINS ─────────────────────────────────────────── */}
       {MOUNTAINS.map((m, i) => (
         <group key={i} position={[m.x, 0, m.z]}>
-          {/* Base triangle (cone) */}
           <mesh position={[0, m.h * 0.5, 0]}>
-            <coneGeometry args={[m.w * 0.5, m.h, 6, 1]} />
-            <meshStandardMaterial
-              color={m.c}
-              roughness={0.92}
-              metalness={0.05}
-            />
+            <coneGeometry args={[m.w * 0.5, m.h, 7, 1]} />
+            <meshStandardMaterial color={m.c} roughness={0.92} metalness={0.04} />
           </mesh>
           {/* Snow cap */}
-          <mesh position={[0, m.h * 0.82, 0]}>
-            <coneGeometry args={[m.w * 0.12, m.h * 0.22, 6, 1]} />
-            <meshStandardMaterial
-              color={isNight ? '#c8d4e0' : '#e8eef4'}
-              roughness={0.8}
-            />
+          <mesh position={[0, m.h * 0.83, 0]}>
+            <coneGeometry args={[m.w * 0.11, m.h * 0.21, 7, 1]} />
+            <meshStandardMaterial color={isNight ? '#c8d4e0' : '#eaeff6'} roughness={0.8} />
           </mesh>
         </group>
       ))}
 
-      {/* === BUILDINGS === */}
-      {BUILDINGS.map((b, i) => (
-        <group key={i} position={[b.x, 0, b.z]}>
-          <mesh position={[0, b.h / 2, 0]} castShadow>
-            <boxGeometry args={[b.w, b.h, b.d]} />
-            <meshStandardMaterial
-              color={b.c}
-              roughness={0.6}
-              metalness={0.25}
-              emissive={b.c}
-              emissiveIntensity={isNight ? 0.08 : 0}
-            />
-          </mesh>
-          {/* Roof trim */}
-          <mesh position={[0, b.h + 0.15, 0]}>
-            <boxGeometry args={[b.w + 0.3, 0.3, b.d + 0.3]} />
-            <meshStandardMaterial color={isNight ? '#334' : '#445'} metalness={0.5} roughness={0.4} />
-          </mesh>
-          {/* Windows */}
-          {isNight && Array.from({ length: Math.floor(b.h / 5) }).map((_, row) =>
-            Array.from({ length: Math.floor(b.w / 3) }).map((_, col) =>
-              Math.random() > 0.25 ? (
-                <mesh key={`${row}-${col}`}
-                  position={[-b.w / 2 + 1.5 + col * 3, 2.5 + row * 5, b.d / 2 + 0.01]}>
-                  <boxGeometry args={[0.9, 1.4, 0.02]} />
-                  <meshStandardMaterial
-                    color="#ffeeaa"
-                    emissive="#ffdd88"
-                    emissiveIntensity={2.0}
-                  />
-                </mesh>
-              ) : null
-            )
-          )}
-        </group>
-      ))}
-
-      {/* === TREES === */}
-      {TREE_ROWS.map(side =>
+      {/* ── TREES (sparse, outside shoulder) ─────────────────── */}
+      {TREE_SIDES.map(side =>
         TREE_Z.map(z => {
-          const xBase = side * 14.5;
+          const xBase = side * 16;
           return (
             <group key={`tree-${side}-${z}`} position={[xBase, 0, z]}>
-              <mesh position={[0, 1.2, 0]} castShadow>
-                <cylinderGeometry args={[0.18, 0.25, 2.4, 7]} />
+              {/* Trunk */}
+              <mesh position={[0, 1.3, 0]} castShadow>
+                <cylinderGeometry args={[0.19, 0.27, 2.6, 7]} />
                 <meshStandardMaterial color={isNight ? '#2a1a08' : '#5c3a18'} roughness={0.98} />
               </mesh>
-              <mesh position={[0, 4.0, 0]} castShadow>
-                <coneGeometry args={[1.4, 4.0, 8]} />
+              {/* Lower cone */}
+              <mesh position={[0, 3.0, 0]} castShadow>
+                <coneGeometry args={[1.8, 2.9, 8]} />
                 <meshStandardMaterial
-                  color={isNight ? '#061206' : '#2a5c18'}
+                  color={isNight ? '#081808' : '#357a20'}
                   roughness={0.85}
-                  metalness={0}
                 />
               </mesh>
-              <mesh position={[0, 2.8, 0]}>
-                <coneGeometry args={[1.7, 2.8, 8]} />
+              {/* Upper cone */}
+              <mesh position={[0, 4.6, 0]} castShadow>
+                <coneGeometry args={[1.3, 3.4, 8]} />
                 <meshStandardMaterial
-                  color={isNight ? '#081808' : '#347a20'}
+                  color={isNight ? '#061206' : '#2a5c18'}
                   roughness={0.85}
                 />
               </mesh>
@@ -198,15 +148,26 @@ export function Environment({ isNight }: Props) {
         })
       )}
 
-      {/* Guardrail concrete base */}
-      <mesh position={[9.2, 0.04, -100]}>
-        <boxGeometry args={[0.5, 0.08, 1200]} />
-        <meshStandardMaterial color={isNight ? '#1e1e1e' : '#888'} roughness={0.9} />
-      </mesh>
-      <mesh position={[-9.2, 0.04, -100]}>
-        <boxGeometry args={[0.5, 0.08, 1200]} />
-        <meshStandardMaterial color={isNight ? '#1e1e1e' : '#888'} roughness={0.9} />
-      </mesh>
+      {/* ── KILOMETRE POSTS every ~80 units ─────────────────── */}
+      {Array.from({ length: 12 }).map((_, i) => {
+        const z = -(i * 80 + 40);
+        return ([1, -1] as const).map(s => (
+          <group key={`km-${i}-${s}`} position={[s * 11.2, 0, z]}>
+            <mesh position={[0, 0.6, 0]}>
+              <boxGeometry args={[0.12, 1.2, 0.12]} />
+              <meshStandardMaterial color={isNight ? '#555' : '#888'} roughness={0.9} />
+            </mesh>
+            <mesh position={[0, 1.35, 0]}>
+              <boxGeometry args={[0.32, 0.26, 0.08]} />
+              <meshStandardMaterial
+                color={isNight ? '#223' : '#1a3a6a'}
+                emissive={isNight ? '#223' : '#000'}
+                emissiveIntensity={isNight ? 0.2 : 0}
+              />
+            </mesh>
+          </group>
+        ));
+      })}
     </>
   );
 }
