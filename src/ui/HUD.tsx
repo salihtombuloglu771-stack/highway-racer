@@ -139,7 +139,7 @@ export function HUD() {
         <div className="w-36 md:w-44 mt-1">
           <div className="flex items-center gap-1.5 mb-0.5">
             <span className="text-cyan-400 text-[10px] font-bold uppercase tracking-wider">⚡ NİTRO</span>
-            <span className="text-white/40 text-[9px]">SHIFT</span>
+            <span className="text-white/40 text-[9px]">{isMobile ? 'DOKUN' : 'SHIFT'}</span>
           </div>
           <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
             <div

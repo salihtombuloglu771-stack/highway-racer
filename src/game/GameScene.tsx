@@ -115,10 +115,14 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
   const bonusCooldown = useRef(0); // throttle showBonusPopup
 
   // Mesh refs
-  const playerCarRef = useRef<Group>(null);
-  const roadRefs     = useRef<(Group | null)[]>([]);
-  const trafficRefs  = useRef<(Group | null)[]>([]);
-  const oncomingRefs = useRef<(Group | null)[]>([]);
+  const playerCarRef  = useRef<Group>(null);
+  const roadRefs      = useRef<(Group | null)[]>([]);
+  const trafficRefs   = useRef<(Group | null)[]>([]);
+  const oncomingRefs  = useRef<(Group | null)[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const spotLeftRef   = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const spotRightRef  = useRef<any>(null);
 
   // Data refs
   const trafficData  = useRef<TrafficCar[]>([]);
@@ -522,6 +526,22 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
       }
     }
 
+    // ── NIGHT HEADLIGHTS — follow player x in real-time ──────────────
+    if (spotLeftRef.current) {
+      spotLeftRef.current.position.x  = playerX.current + 0.65;
+      if (spotLeftRef.current.target) {
+        spotLeftRef.current.target.position.x = playerX.current + 0.65;
+        spotLeftRef.current.target.updateMatrixWorld();
+      }
+    }
+    if (spotRightRef.current) {
+      spotRightRef.current.position.x  = playerX.current - 0.65;
+      if (spotRightRef.current.target) {
+        spotRightRef.current.target.position.x = playerX.current - 0.65;
+        spotRightRef.current.target.updateMatrixWorld();
+      }
+    }
+
     // ── HUD UPDATE ────────────────────────────────────────────────────
     hudTimer.current += dt;
     if (hudTimer.current >= 0.05) {
@@ -569,12 +589,12 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
         model={selectedCarModel}
       />
 
-      {/* Player headlight beams (night) */}
+      {/* Player headlight beams (night) — positions updated in useFrame */}
       {isNightMode && (
         <>
           <spotLight
-            position={[playerX.current + 0.65, 0.55, -2.3]}
-            target-position={[playerX.current + 0.65, 0, -30]}
+            ref={spotLeftRef}
+            position={[PLAYER_START_X + 0.65, 0.55, -2.3]}
             angle={0.34}
             penumbra={0.4}
             intensity={45}
@@ -582,8 +602,8 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
             color="white"
           />
           <spotLight
-            position={[playerX.current - 0.65, 0.55, -2.3]}
-            target-position={[playerX.current - 0.65, 0, -30]}
+            ref={spotRightRef}
+            position={[PLAYER_START_X - 0.65, 0.55, -2.3]}
             angle={0.34}
             penumbra={0.4}
             intensity={45}

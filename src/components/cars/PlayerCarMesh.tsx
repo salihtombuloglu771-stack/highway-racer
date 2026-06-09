@@ -48,16 +48,6 @@ const WheelSpin = forwardRef<Group, object>((_, ref) => (
 ));
 WheelSpin.displayName = 'WheelSpin';
 
-// Outer frame (orientation only — Rz(π/2) makes the axle sideways)
-const Wheel = ({ pos, spinRef }: {
-  pos: [number, number, number];
-  spinRef: React.RefObject<Group | null>;
-}) => (
-  <group position={pos} rotation={[0, 0, Math.PI / 2]}>
-    <WheelSpin ref={spinRef} />
-  </group>
-);
-
 // ── BODY MATERIAL HELPERS ─────────────────────────────────────────────────────
 // Physical material constants for automotive clearcoat paint
 const BM = 0.08;  // metalness  (paint is barely metallic — clearcoat adds the gloss)
@@ -1129,17 +1119,20 @@ export const PlayerCarMesh = forwardRef<Group, Props>(({ color = '#e11d48', isNi
   return (
     <group ref={ref}>
       {/* GLB real 3D model — Suspense falls back to procedural body while loading */}
+      {/* Fallback wrapped in Math.PI so front faces away from camera (same as GLB rotation) */}
       <Suspense fallback={
-        model === 'classic'  ? <ClassicBody  color={color} isNight={isNight} /> :
-        model === 'muscle'   ? <MuscleBody   color={color} isNight={isNight} /> :
-        model === 'electric' ? <ElectricBody color={color} isNight={isNight} /> :
-        model === 'hypercar' ? <HypercarBody color={color} isNight={isNight} /> :
-        <BaseBody color={color} isNight={isNight}>
-          {brand === 'bmw'      && <BMWFront isNight={isNight} />}
-          {brand === 'mercedes' && <MercedesFront isNight={isNight} />}
-          {brand === 'audi'     && <AudiFront isNight={isNight} />}
-          {brand === 'tofas'    && <TofasFront isNight={isNight} />}
-        </BaseBody>
+        <group rotation={[0, Math.PI, 0]}>
+          {model === 'classic'  ? <ClassicBody  color={color} isNight={isNight} /> :
+           model === 'muscle'   ? <MuscleBody   color={color} isNight={isNight} /> :
+           model === 'electric' ? <ElectricBody color={color} isNight={isNight} /> :
+           model === 'hypercar' ? <HypercarBody color={color} isNight={isNight} /> :
+           <BaseBody color={color} isNight={isNight}>
+             {brand === 'bmw'      && <BMWFront isNight={isNight} />}
+             {brand === 'mercedes' && <MercedesFront isNight={isNight} />}
+             {brand === 'audi'     && <AudiFront isNight={isNight} />}
+             {brand === 'tofas'    && <TofasFront isNight={isNight} />}
+           </BaseBody>}
+        </group>
       }>
         <GLBCarBody url={glbUrl} />
       </Suspense>

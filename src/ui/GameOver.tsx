@@ -3,7 +3,7 @@ import { useGameStore } from '@/store/gameStore';
 
 export function GameOver() {
   const { score, highScore, distance, setMode, resetGame } = useGameStore();
-  const isNewRecord = score >= highScore;
+  const isNewRecord = score > 0 && score >= highScore;
 
   const replay = () => {
     resetGame();
