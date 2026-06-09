@@ -1,9 +1,10 @@
 'use client';
-import { forwardRef, useRef } from 'react';
+import { forwardRef, useRef, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Group } from 'three';
 import { CarBrand, CarModel } from '@/store/gameStore';
 import { useGameStore } from '@/store/gameStore';
+import { GLBCarBody, CAR_GLB } from './GLBCarBody';
 
 interface Props { color?: string; isNight?: boolean; brand?: CarBrand; model?: CarModel; }
 
@@ -1123,29 +1124,26 @@ export const PlayerCarMesh = forwardRef<Group, Props>(({ color = '#e11d48', isNi
     }
   });
 
+  const glbUrl = CAR_GLB[model];
+
   return (
     <group ref={ref}>
-      {model === 'classic' ? (
-        <ClassicBody color={color} isNight={isNight} />
-      ) : model === 'muscle' ? (
-        <MuscleBody color={color} isNight={isNight} />
-      ) : model === 'electric' ? (
-        <ElectricBody color={color} isNight={isNight} />
-      ) : model === 'hypercar' ? (
-        <HypercarBody color={color} isNight={isNight} />
-      ) : (
+      {/* GLB real 3D model — Suspense falls back to procedural body while loading */}
+      <Suspense fallback={
+        model === 'classic'  ? <ClassicBody  color={color} isNight={isNight} /> :
+        model === 'muscle'   ? <MuscleBody   color={color} isNight={isNight} /> :
+        model === 'electric' ? <ElectricBody color={color} isNight={isNight} /> :
+        model === 'hypercar' ? <HypercarBody color={color} isNight={isNight} /> :
         <BaseBody color={color} isNight={isNight}>
           {brand === 'bmw'      && <BMWFront isNight={isNight} />}
           {brand === 'mercedes' && <MercedesFront isNight={isNight} />}
           {brand === 'audi'     && <AudiFront isNight={isNight} />}
           {brand === 'tofas'    && <TofasFront isNight={isNight} />}
         </BaseBody>
-      )}
-      {/* Wheels rendered outside body component so spinRefs can be passed */}
-      <Wheel pos={[ 1.13, 0.36,  1.38]} spinRef={spinFL} />
-      <Wheel pos={[-1.13, 0.36,  1.38]} spinRef={spinFR} />
-      <Wheel pos={[ 1.13, 0.36, -1.38]} spinRef={spinRL} />
-      <Wheel pos={[-1.13, 0.36, -1.38]} spinRef={spinRR} />
+      }>
+        <GLBCarBody url={glbUrl} />
+      </Suspense>
+      {/* Wheels only for procedural fallback — GLB models include their own wheels */}
     </group>
   );
 });
