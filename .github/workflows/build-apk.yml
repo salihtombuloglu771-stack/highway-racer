@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Setup Java
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -29,56 +29,106 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Accept Android licenses
-        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null || true
 
-      - name: Install Bubblewrap CLI
-        run: npm install -g @bubblewrap/cli
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli@1.21.1
 
-      - name: Prepare build directory
+      - name: Configure Bubblewrap paths
         run: |
-          mkdir -p apk-build
-          cp .github/twa-manifest.json apk-build/twa-manifest.json
+          mkdir -p ~/.bubblewrap
+          echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > ~/.bubblewrap/config.json
+
+      - name: Install expect
+        run: sudo apt-get install -y expect
 
       - name: Generate keystore
         run: |
-          cd apk-build
+          mkdir -p apk-build
           keytool -genkey -v \
-            -keystore android.keystore \
+            -keystore apk-build/android.keystore \
             -alias hr3d \
             -keyalg RSA \
             -keysize 2048 \
             -validity 10000 \
             -storepass "HR3d2024!" \
-            -keypass "HR3d2024!" \
+            -keypass  "HR3d2024!" \
             -dname "CN=Highway Racer, OU=Dev, O=HR3D, L=Istanbul, ST=Istanbul, C=TR"
+          echo "Keystore created:"
+          ls -la apk-build/
 
-      - name: Configure Bubblewrap (skip JDK prompts)
+      - name: Init Bubblewrap project
+        working-directory: apk-build
         run: |
-          mkdir -p ~/.bubblewrap
-          echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > ~/.bubblewrap/config.json
-          cat ~/.bubblewrap/config.json
-
-      - name: Build APK with Bubblewrap
-        run: |
-          cd apk-build
-          # Use yes to auto-answer all remaining prompts (update checks etc.)
-          yes | bubblewrap build --skipPwaValidation 2>&1 || true
-          echo "=== Build complete, searching for APK ==="
-          find . -name "*.apk" 2>/dev/null || echo "No APK found"
-          find . -name "*.aab" 2>/dev/null || echo "No AAB found"
+          cat > /tmp/init.exp << 'EXPECT'
+          set timeout 180
+          spawn bubblewrap init --manifest "https://highway-racer-virid.vercel.app/manifest.json"
+          # Accept / confirm manifest URL
+          expect {
+            -re {.*\[Y/n\].*|.*\(Y/n\).*|.*yes/no.*} {
+              send "y\r"; exp_continue
+            }
+            -re {.*[Aa]pplication.*(id|Id|ID).*:.*} {
+              send "com.highwayracer.app\r"; exp_continue
+            }
+            -re {.*[Ss]igning key.*path.*:.*|.*keystore.*file.*:.*} {
+              send "./android.keystore\r"; exp_continue
+            }
+            -re {.*[Aa]lias.*:.*} {
+              send "hr3d\r"; exp_continue
+            }
+            -re {.*[Kk]ey.*[Pp]ass.*:.*|.*[Kk]ey.*password.*:.*} {
+              send "HR3d2024!\r"; exp_continue
+            }
+            -re {.*[Ss]tore.*[Pp]ass.*:.*|.*[Ss]tore.*password.*:.*} {
+              send "HR3d2024!\r"; exp_continue
+            }
+            -re {.*[Ff]irst.*[Ll]ast.*[Nn]ame.*:.*} {
+              send "Highway Racer\r"; exp_continue
+            }
+            -re {.*[Oo]rganizational.*[Uu]nit.*:.*} {
+              send "Dev\r"; exp_continue
+            }
+            -re {.*[Oo]rganization.*:.*} {
+              send "HR3D\r"; exp_continue
+            }
+            -re {.*[Cc]ountry.*:.*} {
+              send "TR\r"; exp_continue
+            }
+            -re {.*\?.*} {
+              send "\r"; exp_continue
+            }
+            eof { }
+            timeout {
+              send_user "\nTimeout waiting for prompt\n"
+            }
+          }
+          EXPECT
+          expect -f /tmp/init.exp
+          echo "=== Init complete, files ==="
           ls -la
 
-      - name: Find and copy APK
+      - name: Build APK
+        working-directory: apk-build
+        run: |
+          echo "=== Building APK ==="
+          bubblewrap build 2>&1
+          echo "=== Build complete ==="
+          find . -name "*.apk" -o -name "*.aab" 2>/dev/null | head -10
+          ls -la
+
+      - name: Find APK
         run: |
           APK=$(find apk-build -name "*.apk" 2>/dev/null | head -1)
           if [ -n "$APK" ]; then
             cp "$APK" highway-racer.apk
-            echo "APK_FOUND=true" >> $GITHUB_ENV
-            echo "Found APK: $APK"
+            echo "APK_FOUND=true"  >> $GITHUB_ENV
+            echo "✅ APK found: $APK ($(du -sh "$APK" | cut -f1))"
           else
             echo "APK_FOUND=false" >> $GITHUB_ENV
-            echo "WARNING: No APK generated"
-            find apk-build -type f 2>/dev/null | head -20
+            echo "❌ APK not found. Build output:"
+            find apk-build -type f -name "*.log" -exec cat {} \; 2>/dev/null | tail -50
+            find apk-build -type f | head -30
           fi
 
       - name: Upload APK artifact
@@ -87,24 +137,26 @@ jobs:
         with:
           name: highway-racer-apk
           path: highway-racer.apk
+          retention-days: 30
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release with APK
         if: env.APK_FOUND == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: Highway Racer 3D v1.0.${{ github.run_number }}
+          tag_name: apk-v${{ github.run_number }}
+          name: "🏎️ Highway Racer 3D - APK v${{ github.run_number }}"
           body: |
-            ## Android APK İndir
+            ## 📱 Android APK İndir
 
-            **Highway Racer 3D** - 3D araba yarışı oyunu
+            Aşağıdaki **highway-racer.apk** dosyasına tıkla, telefonuna indir.
 
-            ### Kurulum Adımları
-            1. `highway-racer.apk` dosyasını indirin
-            2. Telefon Ayarları → Güvenlik → **Bilinmeyen kaynaklardan yükleme**'yi açın
-            3. APK dosyasına dokunarak kurulumu başlatın
+            ### Kurulum:
+            1. `highway-racer.apk` indir
+            2. Telefonunda: **Ayarlar → Güvenlik → Bilinmeyen Kaynak** açık olsun
+            3. İndirilen APK'ya dokun → **Yükle**
+            4. Oyunu aç, landscape modda oyna 🎮
 
-            > Minimum Android 7.0 (API 24) gerektirir
+            > Android 7.0+ gerektirir
           files: highway-racer.apk
-          fail_on_unmatched_files: false
           draft: false
+          prerelease: false
