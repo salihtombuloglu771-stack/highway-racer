@@ -593,27 +593,27 @@ export function GameScene({ isMobile: _isMobile = false }: GameSceneProps) {
         </>
       )}
 
-      {/* Same-direction traffic */}
+      {/* Same-direction traffic — rotated 180° so taillights face player */}
       {trafficData.current.map((car, i) => (
         <group
           key={car.id}
           ref={el => { trafficRefs.current[i] = el; }}
           position={[car.x, 0, car.z]}
         >
-          <TrafficCarMesh type={car.type} color={car.color} isNight={isNightMode} />
+          <group rotation={[0, Math.PI, 0]}>
+            <TrafficCarMesh type={car.type} color={car.color} isNight={isNightMode} />
+          </group>
         </group>
       ))}
 
-      {/* Oncoming traffic — rotated 180° to face player */}
+      {/* Oncoming traffic — no rotation, headlights face player */}
       {oncomingData.current.map((car, i) => (
         <group
           key={car.id}
           ref={el => { oncomingRefs.current[i] = el; }}
           position={[car.x, 0, car.z]}
         >
-          <group rotation={[0, Math.PI, 0]}>
-            <TrafficCarMesh type={car.type} color={car.color} isNight={isNightMode} />
-          </group>
+          <TrafficCarMesh type={car.type} color={car.color} isNight={isNightMode} />
         </group>
       ))}
     </>
